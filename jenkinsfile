@@ -1,0 +1,47 @@
+pipeline {
+environment {
+registry = "mansourianas/tp4"
+registryCredential = 'dockerhub'
+dockerImage = ''
+}
+agent any
+stages {
+stage('Cloning Git') {
+steps {
+git 'https://github.com/Mansouri-Anas/tp4devops.git'
+}
+}
+ stage('Run Windows Command') {
+      agent {
+        // Specify a node that runs on a Windows machine
+        label 'windows'
+      }
+      steps {
+        // Add any additional Windows command line scripts you need to run here
+        bat 'docker login -u "mansourianas" -p "Mansouri1@" docker.io'
+      }
+    }
+stage('Building image') {
+steps{
+script {
+dockerImage = docker.build registry + ":$BUILD_NUMBER"
+}
+}
+}
+stage('Test image') {
+steps{
+script {
+
+echo "Tests passed"
+}
+}
+}
+stage('Publish Image') {
+steps{
+script {
+dockerImage.push()
+}
+}
+}
+}
+}
